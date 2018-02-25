@@ -4,11 +4,15 @@ import { Store, Unsubscribe } from 'redux';
 import { FlagsProvider } from './flags-provider';
 import { Flags, ResolvedFlags, Value } from './types';
 
+export interface ConnectedFlagsProviderProps {
+  onFlagUsed: () => {},
+}
+
 export interface ConnectedFlagsProviderState {
   flags: Flags;
 }
 
-export class ConnectedFlagsProvider extends React.Component<{}, ConnectedFlagsProviderState> {
+export class ConnectedFlagsProvider extends React.Component<ConnectedFlagsProviderProps, ConnectedFlagsProviderState> {
   public static contextTypes = { store: () => null };
 
   private store: Store<ConnectedFlagsProviderState>;
@@ -36,9 +40,9 @@ export class ConnectedFlagsProvider extends React.Component<{}, ConnectedFlagsPr
   }
 
   public render() {
-    const { children } = this.props;
+    const { children, onFlagUsed } = this.props;
     const { flags } = this.state;
 
-    return <FlagsProvider flags={flags}>{children}</FlagsProvider>;
+    return <FlagsProvider flags={flags} onFlagUsed={onFlagUsed}>{children}</FlagsProvider>;
   }
 }

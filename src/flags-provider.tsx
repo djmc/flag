@@ -1,10 +1,11 @@
 import { deepComputed } from 'deep-computed';
 import * as React from 'react';
 import { Flags, ResolvedFlags, Value } from './types';
-import { key } from './key';
+import { key, onFlagUsedCallbackKey } from './key';
 
 export interface FlagProviderProps {
   flags: Flags;
+  onFlagUsed: () => {},
   children: React.ReactNode;
 }
 
@@ -32,6 +33,7 @@ export class FlagsProvider extends React.PureComponent<FlagProviderProps, FlagPr
   public getChildContext() {
     return {
       [key]: this.state.computed,
+      [onFlagUsedCallbackKey]: this.props.onFlagUsed,
     };
   }
 

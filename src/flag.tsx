@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { key } from './key';
+import { key, onFlagUsedCallbackKey } from './key';
 import { Flags, FlagChildProps, Value, Renderer } from './types';
 
 export interface FlagProps {
@@ -43,23 +43,35 @@ function resolve(
 }
 
 export class Flag extends React.Component<FlagProps, {}> {
-  public static contextTypes = { [key]: () => null };
+  public static contextTypes = {
+    [key]: () => null,
+    [onFlagUsedCallbackKey]: () => null
+  };
+
+  public isEnabled: boolean;
+
+  public componentDidMount() {
+    const callback = this.context[onFlagUsedCallbackKey];
+    if (callback) {
+      callback(this.props.name, this.isEnabled);
+    }
+  }
 
   public render() {
     const { name, component, render, fallbackComponent, fallbackRender, ...rest } = this.props;
     const value = getFlag(this.context[key], name);
-    const isEnabled = Boolean(value);
+    this.isEnabled = Boolean(value);
 
     const props: FlagChildProps<typeof rest, { [key: string]: typeof value }> = {
       ...rest,
       flags: { [name]: value },
     };
 
-    if (isEnabled && props.children) {
+    if (this.isEnabled && props.children) {
       return props.children;
     }
 
-    if (isEnabled) {
+    if (this.isEnabled) {
       return resolve(props, component, render) || null;
     }
 
